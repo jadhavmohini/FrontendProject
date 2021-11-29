@@ -1,0 +1,244 @@
+<!-- log ou button -->
+<div class="row" style="background-color: darkgrey;">
+  <div class="col-md-6">
+     </div>
+  <div class="col-md-6">
+    <button class="btn btn-danger mt-2 mb-2" style=" margin-left: 61%;" (click)="logOut();">LogOut</button>
+  </div>
+</div>
+<!-- table for display employee list -->
+<div class="container mt-5">
+  <h2>Employee List</h2>
+  <button class="btn btn-primary pull-right" style="margin-left: 84%;
+  margin-top: -68px; width: 140px;" (click)="open(mymodal)">Add Employee</button>
+  <table class="table table-striped border">
+    <thead style="background-color: black; color: white; text-transform: uppercase;">
+        <tr>
+          <th>Id</th>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Phone</th>
+          <th>DOB</th>
+          <th>City</th>
+          <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let emp of employeeLists">
+        <td>{{ emp.empId }}</td>
+        <td>{{ emp.firstname }} {{ emp.lastname }}</td>
+        <td>{{ emp.email }}</td>
+        <td>{{ emp.mobile }}</td>
+        <td>{{ getDate(emp.dob)}}</td>
+        <td>{{ emp.city }}</td>
+        <td> <button class="btn btn-primary btn-sm" (click)="edit(emp);open(myeditmodal)">Edit</button>&nbsp;
+          <button class="btn btn-danger btn-sm" (click)="open(mydeletemodal)">Delete</button>
+          <ng-template #mydeletemodal let-modal>
+            <div class="modal-header">
+              <h4 class="modal-title" id="modal-basic-title">Remove Employee</h4>
+              <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+             <h2>Are You Sure About Delete Record ?</h2>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-danger" (click)="Delete(emp._id);modal.close('Save click')">Yes</button>
+            </div>
+          </ng-template>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<!-- added model pop up for add employee -->
+  <ng-template #mymodal let-modal>
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">Add Employee</h4>
+      <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <form [formGroup]="employeeForm">
+        <div  class="form-group">
+          <label for="inputName">First Name<span style="color: red">*</span></label>
+          <input class="form-control" type="text" formControlName="fname"
+           [ngClass]="{ 'is-invalid': submitted && myForm.fname.errors }">
+          <!-- error -->
+          <div *ngIf="submitted && myForm.fname.errors" class="invalid-feedback">
+              <div *ngIf="myForm.fname.errors.required">First Name is required</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="inputName">Last Name<span style="color: red">*</span></label>
+          <input class="form-control" type="text" formControlName="lname"
+           [ngClass]="{ 'is-invalid': submitted && myForm.lname.errors }">
+          <!-- error -->
+          <div *ngIf="submitted && myForm.lname.errors" class="invalid-feedback">
+              <div *ngIf="myForm.lname.errors.required">Last Name is required</div>
+          </div>
+          
+        </div>
+
+        <div class="form-group">
+          <label for="inputEmail3">Email<span style="color: red">*</span></label>
+          <input class="form-control" type="text" formControlName="email"
+          [ngClass]="{ 'is-invalid': submitted && myForm.email.errors }">
+          <!-- error -->
+          <div *ngIf="submitted && myForm.email.errors" class="invalid-feedback">
+              <div *ngIf="myForm.email.errors.required">Enter your email.</div>
+              <div *ngIf="myForm.email.errors.email"> Enter valid email.</div>
+          </div>
+        
+        </div>
+       
+      <div class="form-group">
+          <label for="inputEmail3">Address<span style="color: red">*</span></label>
+          <input class="form-control" type="text" formControlName="address"
+          [ngClass]="{ 'is-invalid': submitted && myForm.address.errors }">
+          <!-- error -->
+          <div *ngIf="submitted && myForm.address.errors" class="invalid-feedback">
+              <div *ngIf="myForm.address.errors.required">Enter your Address.</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="inputVerify3">Mobile No<span style="color: red">*</span></label>
+          <input class="form-control" type="tel" formControlName="phoneNumber"
+          [ngClass]="{ 'is-invalid': submitted && myForm.phoneNumber.errors }">
+          <!-- error -->
+          <div *ngIf="submitted && myForm.phoneNumber.errors" class="invalid-feedback">
+              <div *ngIf="myForm.phoneNumber.errors.required">Enter your phone number.</div>
+              <div *ngIf="myForm.phoneNumber.errors.pattern">Enter Numbers Only.</div>
+              <div *ngIf="myForm.phoneNumber.errors.minlength">
+                  Enter 10 digit Numbers Only.</div>
+              <div *ngIf="myForm.phoneNumber.errors.maxlength">Enter 10 digit Numbers Only.</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="name">Select Dob <span style="color: red">*</span></label>
+          <input onkeydown="return false" [bsConfig]="{ isAnimated: true, dateInputFormat: 'YYYY-MM-DD'}"
+            class="form-control" bsDatepicker [maxDate]="maxDate" formControlName="Dob"
+            [ngClass]="{ 'is-invalid': submitted && myForm.Dob.errors }">
+            <!-- error -->
+            <div *ngIf="submitted && myForm.Dob.errors" class="invalid-feedback">
+              <div *ngIf="myForm.Dob.errors.required">Please Select Date.</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="form-group">
+            <label for="name">city <span style="color: red">*</span></label>
+            <select id="Role" formControlName="city" class="form-control"
+            [ngClass]="{ 'is-invalid': submitted && myForm.city.errors }">
+              <option value='' selected disabled>Select city </option>
+              <option *ngFor="let obj of citylist" [value]="obj.name">{{obj.name}}</option>
+            </select>
+            <div *ngIf="submitted && myForm.city.errors" class="invalid-feedback">
+              <div *ngIf="myForm.city.errors.required">Please Select city Name</div>
+          </div>
+          </div>
+          </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-danger" (click)="Submit();">Save</button>
+    </div>
+  </ng-template>
+<!-- model poup for edit employee details -->
+  <ng-template #myeditmodal let-modal>
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">Employee Details</h4>
+      <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      
+      <form [formGroup]="employeeForm">
+        <div  class="form-group">
+          <label for="inputName">First Name<span style="color: red">*</span></label>
+          <input class="form-control" type="text" formControlName="fname" [(ngModel)]="fname"
+           [ngClass]="{ 'is-invalid': submitted && myForm.fname.errors }">
+          <!-- error -->
+          <div *ngIf="submitted && myForm.fname.errors" class="invalid-feedback">
+              <div *ngIf="myForm.fname.errors.required">First Name is required</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="inputName">Last Name<span style="color: red">*</span></label>
+          <input class="form-control" type="text" formControlName="lname" [(ngModel)]="lname"
+           [ngClass]="{ 'is-invalid': submitted && myForm.lname.errors }">
+          <!-- error -->
+          <div *ngIf="submitted && myForm.lname.errors" class="invalid-feedback">
+              <div *ngIf="myForm.lname.errors.required">Last Name is required</div>
+          </div>
+          
+        </div>
+
+        <div class="form-group">
+          <label for="inputEmail3">Email<span style="color: red">*</span></label>
+          <input class="form-control" type="text" formControlName="email" [(ngModel)]="email"
+          [ngClass]="{ 'is-invalid': submitted && myForm.email.errors }">
+          <!-- error -->
+          <div *ngIf="submitted && myForm.email.errors" class="invalid-feedback">
+              <div *ngIf="myForm.email.errors.required">Enter your email.</div>
+              <div *ngIf="myForm.email.errors.email"> Enter valid email.</div>
+          </div>
+        
+        </div>
+       
+      <div class="form-group">
+          <label for="inputEmail3">Address<span style="color: red">*</span></label>
+          <input class="form-control" type="text" formControlName="address" [(ngModel)]="address"
+          [ngClass]="{ 'is-invalid': submitted && myForm.address.errors }">
+          <!-- error -->
+          <div *ngIf="submitted && myForm.address.errors" class="invalid-feedback">
+              <div *ngIf="myForm.address.errors.required">Enter your Address.</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="inputVerify3">Mobile No<span style="color: red">*</span></label>
+          <input class="form-control" type="tel" formControlName="phoneNumber" [(ngModel)]="phoneNumber"
+          [ngClass]="{ 'is-invalid': submitted && myForm.phoneNumber.errors }">
+          <!-- error -->
+          <div *ngIf="submitted && myForm.phoneNumber.errors" class="invalid-feedback">
+              <div *ngIf="myForm.phoneNumber.errors.required">Enter your phone number.</div>
+              <div *ngIf="myForm.phoneNumber.errors.pattern">Enter Numbers Only.</div>
+              <div *ngIf="myForm.phoneNumber.errors.minlength">
+                  Enter 10 digit Numbers Only.</div>
+              <div *ngIf="myForm.phoneNumber.errors.maxlength">Enter 10 digit Numbers Only.</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="name">Select Dob <span style="color: red">*</span></label>
+          <input onkeydown="return false" [bsConfig]="{ isAnimated: true, dateInputFormat: 'YYYY-MM-DD'}"
+            class="form-control" bsDatepicker [maxDate]="maxDate" formControlName="Dob" [(ngModel)]="Dob"
+            [ngClass]="{ 'is-invalid': submitted && myForm.Dob.errors }">
+            <!-- error -->
+            <div *ngIf="submitted && myForm.Dob.errors" class="invalid-feedback">
+              <div *ngIf="myForm.Dob.errors.required">Please Select Date.</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="form-group">
+            <label for="name">city <span style="color: red">*</span></label>
+            <select id="Role" formControlName="city" [(ngModel)]="city" class="form-control"
+            [ngClass]="{ 'is-invalid': submitted && myForm.city.errors }">
+              <option value='' selected disabled>Select city </option>
+              <option *ngFor="let obj of citylist" [value]="obj.name">{{obj.name}}</option>
+            </select>
+            <div *ngIf="submitted && myForm.city.errors" class="invalid-feedback">
+              <div *ngIf="myForm.city.errors.required">Please Select city Name</div>
+          </div>
+          </div>
+          </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline-dark" (click)="update();modal.close('Save click')">Update</button>
+    </div>
+  </ng-template>
+
+
+
