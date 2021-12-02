@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
 import { GlobalService } from '../services/GlobalService';
 
 @Component({
@@ -20,7 +21,7 @@ export class ManagerComponent implements OnInit {
   maxDate: any;
   minDate: any;
   constructor(private http: HttpClient, private router: Router,
-    public fb: FormBuilder, private datePipe: DatePipe,
+    public fb: FormBuilder, private datePipe: DatePipe,private toastr: ToastrService,
     public apiService: GlobalService,) { }
 
   ngOnInit(): void {
@@ -83,6 +84,7 @@ export class ManagerComponent implements OnInit {
       this.http.post<any>(url, body).subscribe((data: any) => {
         console.log(data, "let check")
         if (data) {
+          this.toastr.success('Registration Done Successfully!', 'Success!');
           this.isRegister = false;
         }
       })
@@ -97,6 +99,7 @@ export class ManagerComponent implements OnInit {
     this.http.post<any>(url, body).subscribe((data: any) => {
       console.log(data, "let check")
       if (data) {
+        this.toastr.success('Now You Are Logged In!', 'Done!');
         // set data to local storage
         localStorage.setItem("token", data.token);
         localStorage.setItem("email", data.Admin.email);

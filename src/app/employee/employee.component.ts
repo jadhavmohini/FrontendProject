@@ -6,6 +6,7 @@ import { HttpClient } from '@angular/common/http';
 import { DatePipe } from '@angular/common';
 import { GlobalService } from '../services/GlobalService';
 import { ModalDismissReasons, NgbModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-employee',
@@ -23,7 +24,8 @@ export class EmployeeComponent implements OnInit {
   maxDate: any;
   minDate: any;
   citylist: any;
-  employeeLists: any;;
+  employeeLists: any;oldDate: any;
+;
   modalOptions: NgbModalOptions;
   closeResult: any;
   fname: any;
@@ -38,6 +40,7 @@ export class EmployeeComponent implements OnInit {
   constructor(public dialog: MatDialog,
     private http: HttpClient,
     private router: Router,
+    private toastr: ToastrService,
     public fb: FormBuilder,
     private datePipe: DatePipe,
     public apiService: GlobalService,
@@ -106,6 +109,7 @@ export class EmployeeComponent implements OnInit {
       if (data) {
         this.isRegister = true;
         this.employeeLists = data;
+        console.log(this.employeeLists,":checkkk")
       }
 
     })
@@ -116,7 +120,8 @@ export class EmployeeComponent implements OnInit {
     this.fname = data.firstname,
       this.lname = data.lastname,
       this.email = data.email,
-      this.Dob = this.datePipe.transform(data.dob, 'YYYY-MM-DD'),
+      this.oldDate=data.dob,
+      this.Dob = data.dob//(this.oldDate, 'YYYY-MM-DD'),
       this.city = data.city,
       this.address = data.address,
       this.phoneNumber = data.mobile
@@ -131,7 +136,7 @@ export class EmployeeComponent implements OnInit {
   // converted or transfer date format for fronted table display
   getDate(data: any) {
     if (data != undefined || data != '') {
-      return this.datePipe.transform(data, 'YYYY-MM-DD')
+      return this.datePipe.transform(data, 'YYYY-MM-dd')
     } else {
       return "-"
     }
@@ -143,6 +148,7 @@ export class EmployeeComponent implements OnInit {
   // add new employee function
   Submit() {
     this.submitted = true;
+    console.log(this.employeeForm.value,"this.employeeForm.value",this.employeeForm.Dob.value)
     if (this.employeeForm.invalid) {
       return
     } else {
@@ -152,7 +158,9 @@ export class EmployeeComponent implements OnInit {
       this.http.post<any>(url, body).subscribe((data: any) => {
         console.log(data, "let check")
         if (data.length != 0) {
+          this.toastr.success('Employee Added Successfully!', 'Success!');
           this.employeeForm.reset();
+          this.modalService.dismissAll()
           this.ngOnInit()
         }
       })
@@ -165,12 +173,14 @@ export class EmployeeComponent implements OnInit {
     if (this.employeeForm.invalid) {
       return
     } else {
+      console.log(this.employeeForm.value.Dob,"lllllllllllllll")
+      console.log(this.oldDate,"checkk",this.Dob)
       let body = {
         id: this.id,
         fname: this.fname,
         lname: this.lname,
         email: this.email,
-        Dob: this.Dob,
+        Dob: this.employeeForm.value.Dob,
         city: this.city,
         address: this.address,
         phoneNumber: this.phoneNumber
@@ -180,6 +190,7 @@ export class EmployeeComponent implements OnInit {
       this.http.post<any>(url, body).subscribe((data: any) => {
         console.log(data, "let check for update")
         if (data.length != 0) {
+          this.toastr.success('Employee Updated Successfully!', 'Success!');
           this.ngOnInit()
         }
 
@@ -195,6 +206,7 @@ export class EmployeeComponent implements OnInit {
     let url = this.apiService.base_path_api() + 'employee/remove';
     this.http.post<any>(url, body).subscribe((data: any) => {
       if (data.length != 0) {
+        this.toastr.success('Employee Deleted Successfully!', 'Success!');
         this.ngOnInit()
       }
 
